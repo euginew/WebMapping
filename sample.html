@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Layers Control Tutorial - Leaflet</title>
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 700px;
+			width: 1500px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+
+		/* CSS */
+		form {
+		  display: flex;
+		  align-items: center;
+		}
+
+		label {
+		  margin-right: 0.5em;
+		}
+
+		input[type="text"] {
+		  border: 1px solid #ccc;
+		  border-radius: 4px;
+		  padding: 0.5em;
+		  width: 30%;
+		}
+
+		button[type="submit"] {
+		  border: 1px solid #ccc;
+		  border-radius: 4px;
+		  background-color: #eee;
+		  color: #000;
+		  padding: 0.5em;
+		  cursor: pointer;
+		}
+
+	</style>
+
+	
+</head>
+<body>
+
+	<div id='map'></div>
+	<button id="geolocate-button">Locate Me</button>
+	
+
+	<form action="" method="get">
+	  <label for="search">Search:</label>
+	  <input type="text" id="search-query" name="search" placeholder="Enter a place name">
+	  <button type="submit">Search</button>
+	</form>
+
+	<script>
+	const mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
+	const mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+ 
+	const streets = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
+
+
+	const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+
+	const map = L.map('map', {
+		center: [-0.448879608722498, 36.991142477576034],
+		zoom: 10,
+		layers: [osm]
+	});
+
+	const baseLayers = {
+		'OpenStreetMap': osm,
+		'Streets': streets
+	};
+
+	const overlays = {
+	
+	};
+
+	const layerControl = L.control.layers(baseLayers, overlays).addTo(map);
+
+	const satellite = L.tileLayer(mbUrl, {id: 'mapbox/satellite-v9', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
+	layerControl.addBaseLayer(satellite, 'Satellite');
+
+	// Create the panning and zooming controls
+	var zoomControl = L.control.zoom({
+	  position: 'topright'
+	});
+	zoomControl.addTo(map); // Add the controls to the map
+
+	// Create the scale control
+	var scaleControl = L.control.scale({
+	  position: 'bottomleft'
+	});
+	scaleControl.addTo(map);  // Add the control to the map
+
+// ADDING NOERTH ARROW
+L.control.northArrow().addTo(map);
+
+//ADDING GEOLOCATION TOOL
+	if (navigator.geolocation) {
+	  // Geolocation is supported
+	} else {
+	  // Geolocation is not supported
+	  console.log("Geolocation is not supported by this browser.");
+	}
+
+	// Selects the button and bind a click event handler
+	var geolocateButton = document.getElementById('geolocate-button');
+	geolocateButton.addEventListener('click', function () {
+	  // Gets the device's current location
+	  navigator.geolocation.getCurrentPosition(function (position) {
+	    // Success!
+	    var lat = position.coords.latitude;
+	    var lon = position.coords.longitude;
+
+	    // Add a marker to the map at the device's current location
+	    L.marker([lat, lon]).addTo(map);
+
+	    // Center the map on the device's current location
+	    map.setView([lat, lon], 13);
+	  }, function (error) {
+	    // Error
+	    console.log("Error: " + error.message);
+
+	  });
+	});
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>
